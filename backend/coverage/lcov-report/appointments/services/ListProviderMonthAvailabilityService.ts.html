@@ -3,7 +3,7 @@
 <html lang="en">
 
 <head>
-    <title>Code coverage report for users/services/AuthenticateUserService.ts</title>
+    <title>Code coverage report for appointments/services/ListProviderMonthAvailabilityService.ts</title>
     <meta charset="utf-8" />
     <link rel="stylesheet" href="../../prettify.css" />
     <link rel="stylesheet" href="../../base.css" />
@@ -19,13 +19,13 @@
 <body>
 <div class='wrapper'>
     <div class='pad1'>
-        <h1><a href="../../index.html">All files</a> / <a href="index.html">users/services</a> AuthenticateUserService.ts</h1>
+        <h1><a href="../../index.html">All files</a> / <a href="index.html">appointments/services</a> ListProviderMonthAvailabilityService.ts</h1>
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>62/62</span>
+                <span class='fraction'>60/60</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>62/62</span>
+                <span class='fraction'>60/60</span>
             </div>
         
             
@@ -117,9 +117,7 @@
 <a name='L58'></a><a href='#L58'>58</a>
 <a name='L59'></a><a href='#L59'>59</a>
 <a name='L60'></a><a href='#L60'>60</a>
-<a name='L61'></a><a href='#L61'>61</a>
-<a name='L62'></a><a href='#L62'>62</a>
-<a name='L63'></a><a href='#L63'>63</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
+<a name='L61'></a><a href='#L61'>61</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
@@ -148,22 +146,6 @@
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">3x</span>
-<span class="cline-any cline-yes">3x</span>
-<span class="cline-any cline-yes">3x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">3x</span>
-<span class="cline-any cline-yes">3x</span>
-<span class="cline-any cline-yes">3x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-yes">3x</span>
-<span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
@@ -177,72 +159,84 @@
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { sign } from 'jsonwebtoken';
-import { injectable, inject } from 'tsyringe';
+<span class="cline-any cline-yes">31x</span>
+<span class="cline-any cline-yes">341x</span>
+<span class="cline-any cline-yes">31x</span>
+<span class="cline-any cline-yes">31x</span>
+<span class="cline-any cline-yes">31x</span>
+<span class="cline-any cline-yes">31x</span>
+<span class="cline-any cline-yes">31x</span>
+<span class="cline-any cline-yes">31x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { injectable, inject } from 'tsyringe';
 &nbsp;
-import authConfig from '@config/auth';
-import User from '@modules/users/infra/typeorm/entities/User';
 import AppError from '@shared/errors/AppError';
-import IUserRepository from '../repositories/IUsersRepository';
-import IHashProvider from '../providers/HashProviders/models/IHashProvider';
+&nbsp;
+import User from '@modules/users/infra/typeorm/entities/User';
+import IAppointmentRepository from '../repositories/IAppointmentRepository';
+import { getDate, getDaysInMonth } from 'date-fns';
 &nbsp;
 interface IRequest {
-  email: string;
-  password: string;
+  provider_id: string;
+  month: number;
+  year: number;
 }
 &nbsp;
-interface IReponse {
-  user: User;
-  token: string;
-}
-&nbsp;
-const INCORRET_COMBINATION_ERROR_MESSAGE =
-  'Incorrect email/password combinantion';
+type IResponse = Array&lt;{
+  day: number;
+  available: boolean;
+}&gt;;
 &nbsp;
 @injectable()
-class AuthenticateUserService {
-  /**
-   *
-   */
-&nbsp;
+class ListProviderMonthAvailabilityService {
   constructor(
-    @inject('UsersRepository') private usersRepository: IUserRepository,
-    @inject('HashProvider') private hashProvider: IHashProvider,
+    @inject('AppointmentRepository')
+    private appointmentRepository: IAppointmentRepository,
   ) {}
-  public async execute({ email, password }: IRequest): Promise&lt;IReponse&gt; {
-    const user = await this.usersRepository.findByEmail(email);
 &nbsp;
-    if (!user) {
-      throw new AppError(INCORRET_COMBINATION_ERROR_MESSAGE);
-    }
-&nbsp;
-    const passwordMatched = await this.hashProvider.compareHash(
-      password,
-      user.password,
+  public async execute({
+    provider_id,
+    month,
+    year,
+  }: IRequest): Promise&lt;IResponse&gt; {
+    const appointments = await this.appointmentRepository.findAllInMonthFromProvider(
+      {
+        provider_id,
+        month,
+        year,
+      },
+    );
+    const numberOfDaysInMonth = getDaysInMonth(new Date(year, month - 1));
+    const eachDayArray = Array.from(
+      { length: numberOfDaysInMonth },
+      (_, index) =&gt; index + 1,
     );
 &nbsp;
-    if (!passwordMatched) {
-      throw new AppError(INCORRET_COMBINATION_ERROR_MESSAGE);
-    }
+    const availability = eachDayArray.map(day =&gt; {
+      const appointmentsInDay = appointments.filter(appointment =&gt; {
+        return getDate(appointment.date) === day;
+      });
 &nbsp;
-    const { secret, expiresIn } = authConfig.jwt;
-&nbsp;
-    const token = sign({ name: user.name }, secret, {
-      subject: user.id,
-      expiresIn,
+      return {
+        day,
+        available: appointmentsInDay.length &lt; 10,
+      };
     });
-    return {
-      user,
-      token,
-    };
+&nbsp;
+    return availability;
   }
 }
 &nbsp;
-export default AuthenticateUserService;
+export default ListProviderMonthAvailabilityService;
 &nbsp;</pre></td></tr></table></pre>
 
                 <div class='push'></div><!-- for sticky footer -->
