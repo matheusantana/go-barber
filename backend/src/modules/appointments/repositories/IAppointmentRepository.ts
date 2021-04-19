@@ -12,5 +12,5 @@ export default interface IAppointmentsRepository {
   ): Promise<Appointment[]>;
   findAllInDayFromProvider(
     data: IFindAllInDayFromProviderDTO,
-  ):
+  ): Promise<Appointment[]>;
 }
