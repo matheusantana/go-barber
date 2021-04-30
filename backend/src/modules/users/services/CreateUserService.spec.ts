@@ -1,41 +1,50 @@
 import AppError from '@shared/errors/AppError';
+
+import FakeCacheProvider from '@shared/container/providers/CacheProvider/fakes/FakeCacheProvider';
 import FakeUsersRepository from '../repositories/fakes/FakeUsersRepository';
+import FakeHashProvider from '../providers/HashProviders/fakes/FakeHashProvider';
 import CreateUserService from './CreateUserService';
-import FakeHasProvider from '../providers/HashProviders/fakes/FakeHashProvider';
 
 let fakeUsersRepository: FakeUsersRepository;
-let fakeHashProvider: FakeHasProvider;
+let fakeHashProvider: FakeHashProvider;
+let fakeCacheProvider: FakeCacheProvider;
 let createUser: CreateUserService;
 
-describe('Create User', () => {
+describe('CreateUser', () => {
   beforeEach(() => {
     fakeUsersRepository = new FakeUsersRepository();
-    fakeHashProvider = new FakeHasProvider();
+    fakeHashProvider = new FakeHashProvider();
+    fakeCacheProvider = new FakeCacheProvider();
 
-    createUser = new CreateUserService(fakeUsersRepository, fakeHashProvider);
+    createUser = new CreateUserService(
+      fakeUsersRepository,
+      fakeHashProvider,
+      fakeCacheProvider,
+    );
   });
+
   it('should be able to create a new user', async () => {
     const user = await createUser.execute({
       name: 'John Doe',
       email: 'johndoe@example.com',
-      password: '123456',
+      password: '123123',
     });
 
     expect(user).toHaveProperty('id');
   });
 
-  it('should not be able to create a new user with same email from another', async () => {
+  it('should not be able to create a new user with email from another', async () => {
     await createUser.execute({
       name: 'John Doe',
       email: 'johndoe@example.com',
-      password: '123456',
+      password: '123123',
     });
 
     await expect(
       createUser.execute({
         name: 'John Doe',
         email: 'johndoe@example.com',
-        password: '123456',
+        password: '123123',
       }),
     ).rejects.toBeInstanceOf(AppError);
   });
